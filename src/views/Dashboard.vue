@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table as UiTable, TableBody as UiTableBody, TableCell as UiTableCell, TableHead as UiTableHead, TableHeader as UiTableHeader, TableRow as UiTableRow } from '@/components/ui/table'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
-import { TrendingUp, ArrowUpRight, ShoppingBag, Calendar, CalendarDays, Wallet } from 'lucide-vue-next'
+import { ShoppingBag, Wallet, CreditCard, Banknote, Smartphone } from 'lucide-vue-next'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -99,59 +99,47 @@ const formatDate = (dateString: string) => {
 
 <template>
   <div class="space-y-6 animate-in fade-in duration-700">
-    <!-- Top Stats -->
+    <!-- Top Stats (Mobile Optimized) -->
     <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
-      <Card class="bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0 shadow-lg relative overflow-hidden col-span-2 lg:col-span-1">
+      <Card class="bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0 shadow-lg relative overflow-hidden col-span-2">
         <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
-          <TrendingUp class="w-32 h-32 -mt-4 -mr-4" />
+          <Wallet class="w-32 h-32 -mt-4 -mr-4" />
         </div>
         <CardHeader class="flex flex-row items-center justify-between pb-2 z-10 relative">
-          <CardTitle class="text-sm font-medium text-slate-300">CA Total</CardTitle>
-          <div class="p-2 bg-white/10 rounded-lg">
-            <ArrowUpRight class="w-4 h-4 text-emerald-400" />
-          </div>
+          <CardTitle class="text-sm font-medium text-slate-300">Total Aujourd'hui</CardTitle>
         </CardHeader>
         <CardContent class="z-10 relative">
-          <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.totalRevenue) }}</div>
-          <p class="text-xs text-slate-400 mt-1">
-            {{ store.sales.length }} ventes au total
-          </p>
+          <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.todayRevenue) }}</div>
         </CardContent>
       </Card>
 
       <Card class="shadow-sm border-slate-200/60">
         <CardHeader class="flex flex-row items-center justify-between pb-2">
-          <CardTitle class="text-sm font-medium text-slate-500">Aujourd'hui</CardTitle>
-          <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600">
-            <Wallet class="w-4 h-4" />
-          </div>
+          <CardTitle class="text-xs font-medium text-slate-500">Carte Bancaire</CardTitle>
+          <CreditCard class="w-4 h-4 text-blue-500" />
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-slate-900">{{ formatCurrency(store.todayRevenue) }}</div>
+          <div class="text-lg font-bold text-slate-900">{{ formatCurrency(store.todayRevenueCB) }}</div>
         </CardContent>
       </Card>
       
       <Card class="shadow-sm border-slate-200/60">
         <CardHeader class="flex flex-row items-center justify-between pb-2">
-          <CardTitle class="text-sm font-medium text-slate-500">Cette Semaine</CardTitle>
-          <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
-            <CalendarDays class="w-4 h-4" />
-          </div>
+          <CardTitle class="text-xs font-medium text-slate-500">Espèces</CardTitle>
+          <Banknote class="w-4 h-4 text-emerald-500" />
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-slate-900">{{ formatCurrency(store.thisWeekRevenue) }}</div>
+          <div class="text-lg font-bold text-slate-900">{{ formatCurrency(store.todayRevenueEspece) }}</div>
         </CardContent>
       </Card>
-      
+
       <Card class="shadow-sm border-slate-200/60">
         <CardHeader class="flex flex-row items-center justify-between pb-2">
-          <CardTitle class="text-sm font-medium text-slate-500">Ce Mois</CardTitle>
-          <div class="p-2 bg-purple-50 rounded-lg text-purple-600">
-            <Calendar class="w-4 h-4" />
-          </div>
+          <CardTitle class="text-xs font-medium text-slate-500">Floa</CardTitle>
+          <Smartphone class="w-4 h-4 text-purple-500" />
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-slate-900">{{ formatCurrency(store.thisMonthRevenue) }}</div>
+          <div class="text-lg font-bold text-slate-900">{{ formatCurrency(store.todayRevenueFloa) }}</div>
         </CardContent>
       </Card>
     </div>
@@ -198,11 +186,17 @@ const formatDate = (dateString: string) => {
                 <UiTableRow v-for="sale in store.sales.slice(0, 5)" :key="sale.id" class="group">
                   <UiTableCell class="pl-4">
                     <div class="font-medium text-slate-900 line-clamp-1">{{ sale.clientName }}</div>
-                    <div class="text-xs text-slate-500 md:hidden mt-0.5">{{ formatDate(sale.date) }}</div>
+                    <div class="text-xs text-slate-500 md:hidden mt-0.5 flex items-center gap-1">
+                      <span>{{ formatDate(sale.date) }}</span>
+                      <span class="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-medium">{{ sale.paymentMethod || 'CB' }}</span>
+                    </div>
                   </UiTableCell>
                   <UiTableCell class="hidden md:table-cell">
                     <div class="text-sm text-slate-600 line-clamp-1">{{ sale.description }}</div>
-                    <div class="text-xs text-slate-400 mt-0.5">{{ formatDate(sale.date) }}</div>
+                    <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
+                      <span>{{ formatDate(sale.date) }}</span>
+                      <span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-medium">{{ sale.paymentMethod || 'CB' }}</span>
+                    </div>
                   </UiTableCell>
                   <UiTableCell class="text-right pr-4 font-semibold text-slate-900">
                     {{ formatCurrency(sale.amount) }}

@@ -8,6 +8,7 @@ export interface Sale {
   clientName: string
   description: string
   amount: number
+  paymentMethod: 'CB' | 'ESPECE' | 'FLOA'
 }
 
 export const useSalesStore = defineStore('sales', () => {
@@ -89,6 +90,28 @@ export const useSalesStore = defineStore('sales', () => {
       .reduce((sum, sale) => sum + sale.amount, 0)
   })
 
+  // === Statistiques par moyen de paiement (Aujourd'hui) ===
+  const todayRevenueCB = computed(() => {
+    const today = new Date().toLocaleDateString('fr-FR')
+    return sales.value
+      .filter(sale => new Date(sale.date).toLocaleDateString('fr-FR') === today && sale.paymentMethod === 'CB')
+      .reduce((sum, sale) => sum + sale.amount, 0)
+  })
+
+  const todayRevenueEspece = computed(() => {
+    const today = new Date().toLocaleDateString('fr-FR')
+    return sales.value
+      .filter(sale => new Date(sale.date).toLocaleDateString('fr-FR') === today && sale.paymentMethod === 'ESPECE')
+      .reduce((sum, sale) => sum + sale.amount, 0)
+  })
+
+  const todayRevenueFloa = computed(() => {
+    const today = new Date().toLocaleDateString('fr-FR')
+    return sales.value
+      .filter(sale => new Date(sale.date).toLocaleDateString('fr-FR') === today && sale.paymentMethod === 'FLOA')
+      .reduce((sum, sale) => sum + sale.amount, 0)
+  })
+
   return {
     sales,
     isLoading,
@@ -98,6 +121,9 @@ export const useSalesStore = defineStore('sales', () => {
     totalRevenue,
     todayRevenue,
     thisWeekRevenue,
-    thisMonthRevenue
+    thisMonthRevenue,
+    todayRevenueCB,
+    todayRevenueEspece,
+    todayRevenueFloa
   }
 })

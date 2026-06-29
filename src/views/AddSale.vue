@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useSalesStore } from '@/store/sales'
+import { useSalesStore, type Sale } from '@/store/sales'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, ArrowLeft, CheckCircle2 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -15,7 +16,8 @@ const formData = ref({
   date: new Date().toISOString().slice(0, 10),
   clientName: '',
   description: '',
-  amount: ''
+  amount: '',
+  paymentMethod: 'CB' as Sale['paymentMethod']
 })
 
 const isSubmitting = ref(false)
@@ -30,7 +32,8 @@ const handleSubmit = async () => {
     date: formData.value.date,
     clientName: formData.value.clientName,
     description: formData.value.description,
-    amount: parseFloat(formData.value.amount)
+    amount: parseFloat(formData.value.amount),
+    paymentMethod: formData.value.paymentMethod
   })
   
   isSubmitting.value = false
@@ -104,21 +107,39 @@ const handleSubmit = async () => {
               required 
             />
           </div>
-          
-          <div class="space-y-2.5">
-            <Label for="amount" class="text-slate-600">Montant de la transaction (€)</Label>
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">€</span>
-              <Input 
-                id="amount" 
-                type="number" 
-                step="0.01" 
-                min="0" 
-                v-model="formData.amount" 
-                placeholder="0.00" 
-                class="pl-8 h-12 text-lg font-semibold shadow-sm focus-visible:ring-slate-900 transition-all"
-                required 
-              />
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2.5">
+              <Label class="text-slate-600">Moyen de paiement</Label>
+              <Select v-model="formData.paymentMethod">
+                <SelectTrigger class="h-12 text-base font-medium shadow-sm focus:ring-slate-900">
+                  <SelectValue placeholder="Sélectionnez..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="CB">Carte Bancaire (CB)</SelectItem>
+                    <SelectItem value="ESPECE">Espèce</SelectItem>
+                    <SelectItem value="FLOA">Floa</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div class="space-y-2.5">
+              <Label for="amount" class="text-slate-600">Montant (€)</Label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">€</span>
+                <Input 
+                  id="amount" 
+                  type="number" 
+                  step="0.01" 
+                  min="0" 
+                  v-model="formData.amount" 
+                  placeholder="0.00" 
+                  class="pl-8 h-12 text-lg font-semibold shadow-sm focus-visible:ring-slate-900 transition-all"
+                  required 
+                />
+              </div>
             </div>
           </div>
         </CardContent>
