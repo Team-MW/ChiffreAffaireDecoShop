@@ -43,10 +43,43 @@ export const useSalesStore = defineStore('sales', () => {
     return sales.value.reduce((sum, sale) => sum + sale.amount, 0)
   })
 
+  const todayRevenue = computed(() => {
+    const today = new Date().toLocaleDateString('fr-FR')
+    return sales.value
+      .filter(sale => new Date(sale.date).toLocaleDateString('fr-FR') === today)
+      .reduce((sum, sale) => sum + sale.amount, 0)
+  })
+
+  const thisWeekRevenue = computed(() => {
+    const now = new Date()
+    const startOfWeek = new Date(now)
+    // Adjust to Monday
+    const day = startOfWeek.getDay()
+    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1)
+    startOfWeek.setDate(diff)
+    startOfWeek.setHours(0, 0, 0, 0)
+
+    return sales.value
+      .filter(sale => new Date(sale.date) >= startOfWeek)
+      .reduce((sum, sale) => sum + sale.amount, 0)
+  })
+
+  const thisMonthRevenue = computed(() => {
+    const now = new Date()
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+
+    return sales.value
+      .filter(sale => new Date(sale.date) >= startOfMonth)
+      .reduce((sum, sale) => sum + sale.amount, 0)
+  })
+
   return {
     sales,
     addSale,
     deleteSale,
-    totalRevenue
+    totalRevenue,
+    todayRevenue,
+    thisWeekRevenue,
+    thisMonthRevenue
   }
 })

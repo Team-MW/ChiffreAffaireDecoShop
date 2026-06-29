@@ -1,0 +1,17 @@
+{
+  "name": "DecoShop",
+  "short_name": "DecoShop",
+  "description": "Mini Logiciel de Gestion DecoShop",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/logo.jpeg",
+      "sizes": "1080x1080",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

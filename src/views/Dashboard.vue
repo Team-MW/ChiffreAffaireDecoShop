@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table as UiTable, TableBody as UiTableBody, TableCell as UiTableCell, TableHead as UiTableHead, TableHeader as UiTableHeader, TableRow as UiTableRow } from '@/components/ui/table'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
-import { TrendingUp, ArrowUpRight, ShoppingBag } from 'lucide-vue-next'
+import { TrendingUp, ArrowUpRight, ShoppingBag, Calendar, CalendarDays, Wallet } from 'lucide-vue-next'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -100,37 +100,58 @@ const formatDate = (dateString: string) => {
 <template>
   <div class="space-y-6 animate-in fade-in duration-700">
     <!-- Top Stats -->
-    <div class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      <Card class="bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0 shadow-lg relative overflow-hidden">
+    <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <Card class="bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0 shadow-lg relative overflow-hidden col-span-2 lg:col-span-1">
         <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
           <TrendingUp class="w-32 h-32 -mt-4 -mr-4" />
         </div>
         <CardHeader class="flex flex-row items-center justify-between pb-2 z-10 relative">
-          <CardTitle class="text-sm font-medium text-slate-300">Chiffre d'Affaires Global</CardTitle>
+          <CardTitle class="text-sm font-medium text-slate-300">CA Total</CardTitle>
           <div class="p-2 bg-white/10 rounded-lg">
             <ArrowUpRight class="w-4 h-4 text-emerald-400" />
           </div>
         </CardHeader>
         <CardContent class="z-10 relative">
-          <div class="text-3xl md:text-4xl font-bold tracking-tight">{{ formatCurrency(store.totalRevenue) }}</div>
-          <p class="text-sm text-slate-400 mt-1 flex items-center gap-1">
-            <span class="text-emerald-400">+12%</span> depuis le mois dernier
+          <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.totalRevenue) }}</div>
+          <p class="text-xs text-slate-400 mt-1">
+            {{ store.sales.length }} ventes au total
           </p>
         </CardContent>
       </Card>
 
       <Card class="shadow-sm border-slate-200/60">
         <CardHeader class="flex flex-row items-center justify-between pb-2">
-          <CardTitle class="text-sm font-medium text-slate-500">Nombre de Ventes</CardTitle>
-          <div class="p-2 bg-slate-100 rounded-lg text-slate-600">
-            <ShoppingBag class="w-4 h-4" />
+          <CardTitle class="text-sm font-medium text-slate-500">Aujourd'hui</CardTitle>
+          <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+            <Wallet class="w-4 h-4" />
           </div>
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-slate-900">{{ store.sales.length }}</div>
-          <p class="text-xs text-slate-500 mt-1">
-            Total des transactions enregistrées
-          </p>
+          <div class="text-2xl font-bold text-slate-900">{{ formatCurrency(store.todayRevenue) }}</div>
+        </CardContent>
+      </Card>
+      
+      <Card class="shadow-sm border-slate-200/60">
+        <CardHeader class="flex flex-row items-center justify-between pb-2">
+          <CardTitle class="text-sm font-medium text-slate-500">Cette Semaine</CardTitle>
+          <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
+            <CalendarDays class="w-4 h-4" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div class="text-2xl font-bold text-slate-900">{{ formatCurrency(store.thisWeekRevenue) }}</div>
+        </CardContent>
+      </Card>
+      
+      <Card class="shadow-sm border-slate-200/60">
+        <CardHeader class="flex flex-row items-center justify-between pb-2">
+          <CardTitle class="text-sm font-medium text-slate-500">Ce Mois</CardTitle>
+          <div class="p-2 bg-purple-50 rounded-lg text-purple-600">
+            <Calendar class="w-4 h-4" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div class="text-2xl font-bold text-slate-900">{{ formatCurrency(store.thisMonthRevenue) }}</div>
         </CardContent>
       </Card>
     </div>

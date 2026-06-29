@@ -13,8 +13,8 @@ const router = useRouter()
     <header class="sticky top-0 z-50 w-full border-b border-slate-200/50 bg-white/80 backdrop-blur-xl hidden md:block shadow-sm">
       <div class="container mx-auto flex h-16 items-center px-6 justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 flex items-center justify-center shadow-md">
-            <Store class="w-5 h-5 text-white" />
+          <div class="w-10 h-10 rounded-xl overflow-hidden shadow-md border border-slate-200/50">
+            <img src="/logo.jpeg" alt="DecoShop Logo" class="w-full h-full object-cover" />
           </div>
           <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
             DecoShop
@@ -44,8 +44,8 @@ const router = useRouter()
     <!-- Mobile Top Header (Just for branding) -->
     <header class="md:hidden sticky top-0 z-40 w-full bg-white/80 backdrop-blur-xl border-b border-slate-200/50 py-3 px-4 flex justify-center items-center">
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-800 to-slate-950 flex items-center justify-center">
-          <Store class="w-4 h-4 text-white" />
+        <div class="w-8 h-8 rounded-lg overflow-hidden shadow-sm border border-slate-200/50">
+          <img src="/logo.jpeg" alt="DecoShop Logo" class="w-full h-full object-cover" />
         </div>
         <h1 class="text-lg font-bold tracking-tight text-slate-900">DecoShop</h1>
       </div>
