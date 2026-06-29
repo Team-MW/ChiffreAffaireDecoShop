@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useSalesStore } from '@/store/sales'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { Table as UiTable, TableBody as UiTableBody, TableCell as UiTableCell, TableHead as UiTableHead, TableHeader as UiTableHeader, TableRow as UiTableRow } from '@/components/ui/table'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
-import { ShoppingBag, Wallet, CreditCard, Banknote, Smartphone, Calendar, CalendarDays } from 'lucide-vue-next'
+import { Wallet, CreditCard, Banknote, Smartphone, Calendar, CalendarDays, Search } from 'lucide-vue-next'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -58,6 +59,22 @@ const chartData = computed(() => {
       }
     ]
   }
+})
+
+const searchQuery = ref('')
+
+const filteredSales = computed(() => {
+  if (!searchQuery.value) return store.sales.slice(0, 5)
+  const q = searchQuery.value.toLowerCase()
+  return store.sales.filter(s => 
+    (s.orderNumber && s.orderNumber.toLowerCase().includes(q)) ||
+    s.clientName.toLowerCase().includes(q)
+  )
+})
+
+const searchTotalAmount = computed(() => {
+  if (!searchQuery.value) return 0
+  return filteredSales.value.reduce((sum, sale) => sum + sale.amount, 0)
 })
 
 const chartOptions = {
@@ -187,42 +204,51 @@ const formatDate = (dateString: string) => {
 
       <!-- Recent Sales List -->
       <Card class="col-span-1 lg:col-span-3 shadow-sm border-slate-200/60 flex flex-col">
-        <CardHeader class="pb-2 border-b border-slate-100">
-          <CardTitle class="text-lg">Ventes Récentes</CardTitle>
-          <CardDescription>Vos 5 dernières transactions.</CardDescription>
+        <CardHeader class="pb-4 border-b border-slate-100">
+          <CardTitle class="text-lg">Ventes & Historique</CardTitle>
+          <div class="mt-3 relative">
+            <Search class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Input 
+              v-model="searchQuery" 
+              placeholder="Rechercher un bon ou client..." 
+              class="pl-9 h-10 shadow-sm"
+            />
+          </div>
+          <div v-if="searchQuery && filteredSales.length > 0" class="mt-3 p-3 bg-emerald-50 rounded-lg border border-emerald-100 flex items-center justify-between animate-in fade-in zoom-in-95">
+            <span class="text-sm font-medium text-emerald-800">Total pour cette recherche :</span>
+            <span class="font-bold text-emerald-600">{{ formatCurrency(searchTotalAmount) }}</span>
+          </div>
         </CardHeader>
         <CardContent class="p-0 flex-1 flex flex-col">
-          <div v-if="store.sales.length === 0" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+          <div v-if="filteredSales.length === 0" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
-              <ShoppingBag class="w-6 h-6 text-slate-400" />
+              <Search class="w-5 h-5 text-slate-400" />
             </div>
-            <p class="text-slate-500 text-sm">Aucune vente enregistrée.</p>
+            <p class="text-slate-500 text-sm">Aucune vente trouvée.</p>
           </div>
           
           <div v-else class="overflow-x-auto">
             <UiTable>
               <UiTableHeader class="bg-slate-50/50">
                 <UiTableRow>
-                  <UiTableHead class="w-[100px] pl-4">Client</UiTableHead>
+                  <UiTableHead class="w-[100px] pl-4">Client / Bon</UiTableHead>
                   <UiTableHead class="hidden md:table-cell">Produit</UiTableHead>
                   <UiTableHead class="text-right pr-4">Montant</UiTableHead>
                 </UiTableRow>
               </UiTableHeader>
               <UiTableBody>
-                <UiTableRow v-for="sale in store.sales.slice(0, 5)" :key="sale.id" class="group">
+                <UiTableRow v-for="sale in filteredSales" :key="sale.id" class="group">
                   <UiTableCell class="pl-4">
                     <div class="font-medium text-slate-900 line-clamp-1">{{ sale.clientName }}</div>
-                    <div class="text-xs text-slate-500 md:hidden mt-0.5 flex items-center gap-1">
+                    <div class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                       <span>{{ formatDate(sale.date) }}</span>
                       <span class="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-medium">{{ sale.paymentMethod || 'CB' }}</span>
                     </div>
+                    <div v-if="sale.orderNumber" class="text-[10px] font-mono text-slate-400 mt-0.5">{{ sale.orderNumber }}</div>
                   </UiTableCell>
                   <UiTableCell class="hidden md:table-cell">
                     <div class="text-sm text-slate-600 line-clamp-1">{{ sale.description }}</div>
-                    <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
-                      <span>{{ formatDate(sale.date) }}</span>
-                      <span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-medium">{{ sale.paymentMethod || 'CB' }}</span>
-                    </div>
+                    <div v-if="sale.orderNumber" class="text-[10px] font-mono text-slate-400 mt-0.5">Bon: {{ sale.orderNumber }}</div>
                   </UiTableCell>
                   <UiTableCell class="text-right pr-4 font-semibold text-slate-900">
                     {{ formatCurrency(sale.amount) }}

@@ -17,7 +17,8 @@ const formData = ref({
   clientName: '',
   description: '',
   amount: '',
-  paymentMethod: 'CB' as Sale['paymentMethod']
+  paymentMethod: 'CB' as Sale['paymentMethod'],
+  orderNumber: ''
 })
 
 const isSubmitting = ref(false)
@@ -33,7 +34,8 @@ const handleSubmit = async () => {
     clientName: formData.value.clientName,
     description: formData.value.description,
     amount: parseFloat(formData.value.amount),
-    paymentMethod: formData.value.paymentMethod
+    paymentMethod: formData.value.paymentMethod,
+    orderNumber: formData.value.orderNumber || undefined
   })
   
   isSubmitting.value = false
@@ -86,15 +88,26 @@ const handleSubmit = async () => {
             />
           </div>
           
-          <div class="space-y-2.5">
-            <Label for="client" class="text-slate-600">Nom du Client</Label>
-            <Input 
-              id="client" 
-              v-model="formData.clientName" 
-              placeholder="Ex: Jean Dupont" 
-              class="h-11 shadow-sm focus-visible:ring-slate-900 transition-all"
-              required 
-            />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-2.5">
+              <Label for="client" class="text-slate-600">Nom du Client</Label>
+              <Input 
+                id="client" 
+                v-model="formData.clientName" 
+                placeholder="Ex: Jean Dupont" 
+                class="h-11 shadow-sm focus-visible:ring-slate-900 transition-all"
+                required 
+              />
+            </div>
+            <div class="space-y-2.5">
+              <Label for="orderNumber" class="text-slate-600">N° de Bon de Commande</Label>
+              <Input 
+                id="orderNumber" 
+                v-model="formData.orderNumber" 
+                placeholder="Ex: BDC-2023" 
+                class="h-11 shadow-sm focus-visible:ring-slate-900 transition-all"
+              />
+            </div>
           </div>
           
           <div class="space-y-2.5">

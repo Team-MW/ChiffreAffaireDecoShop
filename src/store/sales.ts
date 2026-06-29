@@ -9,6 +9,7 @@ export interface Sale {
   description: string
   amount: number
   paymentMethod: 'CB' | 'ESPECE' | 'FLOA'
+  orderNumber?: string
 }
 
 export const useSalesStore = defineStore('sales', () => {
