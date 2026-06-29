@@ -21,27 +21,24 @@ const formData = ref({
 const isSubmitting = ref(false)
 const isSuccess = ref(false)
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!formData.value.clientName || !formData.value.amount) return
 
   isSubmitting.value = true
   
-  // Simulate slight delay for UX
+  await store.addSale({
+    date: formData.value.date,
+    clientName: formData.value.clientName,
+    description: formData.value.description,
+    amount: parseFloat(formData.value.amount)
+  })
+  
+  isSubmitting.value = false
+  isSuccess.value = true
+  
   setTimeout(() => {
-    store.addSale({
-      date: formData.value.date,
-      clientName: formData.value.clientName,
-      description: formData.value.description,
-      amount: parseFloat(formData.value.amount)
-    })
-    
-    isSubmitting.value = false
-    isSuccess.value = true
-    
-    setTimeout(() => {
-      router.push({ name: 'home' })
-    }, 800)
-  }, 600)
+    router.push({ name: 'home' })
+  }, 800)
 }
 </script>
 

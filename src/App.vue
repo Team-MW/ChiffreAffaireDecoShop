@@ -1,5 +1,13 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { useSalesStore } from '@/store/sales'
 import AppLayout from '@/components/layout/AppLayout.vue'
+
+const store = useSalesStore()
+
+onMounted(() => {
+  store.fetchSales()
+})
 </script>
 
 <template>

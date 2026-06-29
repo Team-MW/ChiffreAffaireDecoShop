@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
+import { supabase } from '@/lib/supabase'
 
 export interface Sale {
   id: string
@@ -11,32 +12,47 @@ export interface Sale {
 
 export const useSalesStore = defineStore('sales', () => {
   const sales = ref<Sale[]>([])
+  const isLoading = ref(false)
 
-  // Load from local storage
-  const savedSales = localStorage.getItem('decoshop-sales')
-  if (savedSales) {
-    try {
-      sales.value = JSON.parse(savedSales)
-    } catch (e) {
-      console.error('Failed to parse sales from localStorage', e)
+  const fetchSales = async () => {
+    isLoading.value = true
+    const { data, error } = await supabase
+      .from('sales')
+      .select('*')
+      .order('date', { ascending: false })
+      
+    if (!error && data) {
+      sales.value = data
+    } else {
+      console.error('Error fetching sales:', error)
+    }
+    isLoading.value = false
+  }
+
+  const addSale = async (sale: Omit<Sale, 'id'>) => {
+    const { data, error } = await supabase
+      .from('sales')
+      .insert([sale])
+      .select()
+      
+    if (!error && data) {
+      sales.value.unshift(data[0])
+    } else {
+      console.error('Error adding sale:', error)
     }
   }
 
-  // Save to local storage on change
-  watch(sales, (newSales) => {
-    localStorage.setItem('decoshop-sales', JSON.stringify(newSales))
-  }, { deep: true })
-
-  const addSale = (sale: Omit<Sale, 'id'>) => {
-    const newSale: Sale = {
-      ...sale,
-      id: crypto.randomUUID()
+  const deleteSale = async (id: string) => {
+    const { error } = await supabase
+      .from('sales')
+      .delete()
+      .eq('id', id)
+      
+    if (!error) {
+      sales.value = sales.value.filter(s => s.id !== id)
+    } else {
+      console.error('Error deleting sale:', error)
     }
-    sales.value.unshift(newSale) // Add to top
-  }
-
-  const deleteSale = (id: string) => {
-    sales.value = sales.value.filter(s => s.id !== id)
   }
 
   const totalRevenue = computed(() => {
@@ -75,6 +91,8 @@ export const useSalesStore = defineStore('sales', () => {
 
   return {
     sales,
+    isLoading,
+    fetchSales,
     addSale,
     deleteSale,
     totalRevenue,
