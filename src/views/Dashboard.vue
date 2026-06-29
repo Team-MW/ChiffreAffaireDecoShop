@@ -5,11 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table as UiTable, TableBody as UiTableBody, TableCell as UiTableCell, TableHead as UiTableHead, TableHeader as UiTableHeader, TableRow as UiTableRow } from '@/components/ui/table'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
-import { ShoppingBag, Wallet, CreditCard, Banknote, Smartphone } from 'lucide-vue-next'
+import { ShoppingBag, Wallet, CreditCard, Banknote, Smartphone, Calendar, CalendarDays } from 'lucide-vue-next'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
 const store = useSalesStore()
+
+const currentMonthName = computed(() => {
+  return new Intl.DateTimeFormat('fr-FR', { month: 'long' }).format(new Date())
+})
 
 const chartData = computed(() => {
   const salesByDate: Record<string, number> = {}
@@ -140,6 +144,28 @@ const formatDate = (dateString: string) => {
         </CardHeader>
         <CardContent>
           <div class="text-lg font-bold text-slate-900">{{ formatCurrency(store.todayRevenueFloa) }}</div>
+        </CardContent>
+      </Card>
+
+      <Card class="shadow-sm border-slate-200/60">
+        <CardHeader class="flex flex-row items-center justify-between pb-2">
+          <CardTitle class="text-xs font-medium text-slate-500">Cette Semaine</CardTitle>
+          <CalendarDays class="w-4 h-4 text-orange-500" />
+        </CardHeader>
+        <CardContent>
+          <div class="text-lg font-bold text-slate-900">{{ formatCurrency(store.thisWeekRevenue) }}</div>
+        </CardContent>
+      </Card>
+
+      <Card class="bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0 shadow-lg relative overflow-hidden col-span-2 lg:col-span-4">
+        <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
+          <Calendar class="w-32 h-32 -mt-4 -mr-4" />
+        </div>
+        <CardHeader class="flex flex-row items-center justify-between pb-2 z-10 relative">
+          <CardTitle class="text-sm font-medium text-slate-300 capitalize">Mois de {{ currentMonthName }}</CardTitle>
+        </CardHeader>
+        <CardContent class="z-10 relative">
+          <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.thisMonthRevenue) }}</div>
         </CardContent>
       </Card>
     </div>
