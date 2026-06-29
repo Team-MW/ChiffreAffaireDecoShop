@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, PlusCircle, Store } from 'lucide-vue-next'
+import { LayoutDashboard, PlusCircle } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
