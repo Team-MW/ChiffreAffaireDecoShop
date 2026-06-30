@@ -42,7 +42,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="max-w-xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+  <div class="max-w-xl mx-auto w-full pb-10">
     <button 
       @click="router.push({ name: 'home' })" 
       class="flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 mb-6 transition-colors"
@@ -82,7 +82,7 @@ const handleSubmit = async () => {
             />
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-2.5">
               <Label class="text-slate-600">Moyen de paiement</Label>
               <Select v-model="formData.paymentMethod">
@@ -107,6 +107,7 @@ const handleSubmit = async () => {
                 <Input 
                   id="amount" 
                   type="number" 
+                  inputmode="decimal"
                   step="0.01" 
                   min="0" 
                   v-model="formData.amount" 

@@ -121,7 +121,7 @@ const formatDate = (dateString: string) => {
 </script>
 
 <template>
-  <div class="space-y-6 animate-in fade-in duration-700">
+  <div class="space-y-6">
     <!-- Top Stats (Mobile Optimized) -->
     <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
       <Card class="bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0 shadow-lg relative overflow-hidden col-span-2">
