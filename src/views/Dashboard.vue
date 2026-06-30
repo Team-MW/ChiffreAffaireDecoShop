@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Table as UiTable, TableBody as UiTableBody, TableCell as UiTableCell, TableHead as UiTableHead, TableHeader as UiTableHeader, TableRow as UiTableRow } from '@/components/ui/table'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
-import { Wallet, CreditCard, Banknote, Smartphone, Calendar, CalendarDays, Search, Trash2 } from 'lucide-vue-next'
+import { Wallet, CreditCard, Banknote, Smartphone, Calendar, Search, Trash2 } from 'lucide-vue-next'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
