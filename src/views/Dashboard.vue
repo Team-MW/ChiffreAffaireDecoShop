@@ -68,7 +68,9 @@ const filteredSales = computed(() => {
   const q = searchQuery.value.toLowerCase()
   return store.sales.filter(s => 
     (s.orderNumber && s.orderNumber.toLowerCase().includes(q)) ||
-    s.clientName.toLowerCase().includes(q)
+    (s.clientName && s.clientName.toLowerCase().includes(q)) ||
+    (s.paymentMethod && s.paymentMethod.toLowerCase().includes(q)) ||
+    s.amount.toString().includes(q)
   )
 })
 
@@ -231,24 +233,22 @@ const formatDate = (dateString: string) => {
             <UiTable>
               <UiTableHeader class="bg-slate-50/50">
                 <UiTableRow>
-                  <UiTableHead class="w-[100px] pl-4">Client / Bon</UiTableHead>
-                  <UiTableHead class="hidden md:table-cell">Produit</UiTableHead>
+                  <UiTableHead class="w-[100px] pl-4">Type / Date</UiTableHead>
+                  <UiTableHead class="hidden md:table-cell">Détails</UiTableHead>
                   <UiTableHead class="text-right pr-4">Montant</UiTableHead>
                 </UiTableRow>
               </UiTableHeader>
               <UiTableBody>
                 <UiTableRow v-for="sale in filteredSales" :key="sale.id" class="group">
                   <UiTableCell class="pl-4">
-                    <div class="font-medium text-slate-900 line-clamp-1">{{ sale.clientName }}</div>
+                    <div class="font-medium text-slate-900 line-clamp-1">Vente ({{ sale.paymentMethod || 'CB' }})</div>
                     <div class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                       <span>{{ formatDate(sale.date) }}</span>
-                      <span class="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-medium">{{ sale.paymentMethod || 'CB' }}</span>
+                      <span v-if="sale.clientName && sale.clientName !== 'Client'" class="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-medium">{{ sale.clientName }}</span>
                     </div>
-                    <div v-if="sale.orderNumber" class="text-[10px] font-mono text-slate-400 mt-0.5">{{ sale.orderNumber }}</div>
                   </UiTableCell>
                   <UiTableCell class="hidden md:table-cell">
-                    <div class="text-sm text-slate-600 line-clamp-1">{{ sale.description }}</div>
-                    <div v-if="sale.orderNumber" class="text-[10px] font-mono text-slate-400 mt-0.5">Bon: {{ sale.orderNumber }}</div>
+                    <div class="text-sm text-slate-600 line-clamp-1">{{ sale.description && sale.description !== 'Vente' ? sale.description : '-' }}</div>
                   </UiTableCell>
                   <UiTableCell class="text-right pr-4 font-semibold text-slate-900">
                     {{ formatCurrency(sale.amount) }}
@@ -259,6 +259,17 @@ const formatDate = (dateString: string) => {
           </div>
         </CardContent>
       </Card>
+    </div>
+
+    <!-- Small unaccessible reset button -->
+    <div class="pt-8 pb-2 flex justify-end">
+      <button 
+        @click="store.deleteAllSales()" 
+        class="text-[10px] text-slate-300 hover:text-red-500 transition-colors px-2 py-1 opacity-50 hover:opacity-100"
+        title="Réinitialiser toutes les données"
+      >
+        Réinitialiser
+      </button>
     </div>
   </div>
 </template>

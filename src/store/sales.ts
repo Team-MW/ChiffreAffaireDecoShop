@@ -5,10 +5,10 @@ import { supabase } from '@/lib/supabase'
 export interface Sale {
   id: string
   date: string
-  clientName: string
-  description: string
+  clientName?: string
+  description?: string
   amount: number
-  paymentMethod: 'CB' | 'ESPECE' | 'FLOA'
+  paymentMethod: 'CB' | 'ESPECE' | 'FLOA' | 'VIREMENT'
   orderNumber?: string
 }
 
@@ -55,6 +55,23 @@ export const useSalesStore = defineStore('sales', () => {
     } else {
       console.error('Error deleting sale:', error)
     }
+  }
+
+  const deleteAllSales = async () => {
+    if (!confirm('Voulez-vous vraiment TOUT effacer ?')) return
+    
+    isLoading.value = true
+    const { error } = await supabase
+      .from('sales')
+      .delete()
+      .not('id', 'is', null)
+      
+    if (!error) {
+      sales.value = []
+    } else {
+      console.error('Error deleting all sales:', error)
+    }
+    isLoading.value = false
   }
 
   const totalRevenue = computed(() => {
@@ -119,6 +136,7 @@ export const useSalesStore = defineStore('sales', () => {
     fetchSales,
     addSale,
     deleteSale,
+    deleteAllSales,
     totalRevenue,
     todayRevenue,
     thisWeekRevenue,
