@@ -32,9 +32,16 @@ export const useSalesStore = defineStore('sales', () => {
   }
 
   const addSale = async (sale: Omit<Sale, 'id'>) => {
+    // Fournir des valeurs par défaut pour satisfaire les contraintes NOT NULL de Supabase
+    const payload = {
+      ...sale,
+      clientName: sale.clientName || 'Client',
+      description: sale.description || 'Vente'
+    }
+
     const { data, error } = await supabase
       .from('sales')
-      .insert([sale])
+      .insert([payload])
       .select()
       
     if (!error && data) {
