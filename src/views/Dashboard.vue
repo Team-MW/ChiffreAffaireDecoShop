@@ -263,10 +263,11 @@ const handleDelete = async (id: string) => {
                   <UiTableCell class="pr-4 text-right">
                     <button 
                       @click="handleDelete(sale.id)" 
-                      class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100 focus:opacity-100"
+                      class="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-red-500 hover:bg-red-600 rounded-md shadow-sm transition-all active:scale-95"
                       title="Supprimer la vente"
                     >
                       <Trash2 class="w-4 h-4" />
+                      <span class="hidden sm:inline">Supprimer</span>
                     </button>
                   </UiTableCell>
                 </UiTableRow>
