@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Table as UiTable, TableBody as UiTableBody, TableCell as UiTableCell, TableHead as UiTableHead, TableHeader as UiTableHeader, TableRow as UiTableRow } from '@/components/ui/table'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
-import { Wallet, CreditCard, Banknote, Smartphone, Calendar, CalendarDays, Search } from 'lucide-vue-next'
+import { Wallet, CreditCard, Banknote, Smartphone, Calendar, CalendarDays, Search, Trash2 } from 'lucide-vue-next'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -117,6 +117,12 @@ const formatCurrency = (amount: number) => {
 
 const formatDate = (dateString: string) => {
   return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short' }).format(new Date(dateString))
+}
+
+const handleDelete = async (id: string) => {
+  if (confirm('Voulez-vous vraiment supprimer cette vente ?')) {
+    await store.deleteSale(id)
+  }
 }
 </script>
 
@@ -235,7 +241,8 @@ const formatDate = (dateString: string) => {
                 <UiTableRow>
                   <UiTableHead class="w-[100px] pl-4">Type / Date</UiTableHead>
                   <UiTableHead class="hidden md:table-cell">Détails</UiTableHead>
-                  <UiTableHead class="text-right pr-4">Montant</UiTableHead>
+                  <UiTableHead class="text-right">Montant</UiTableHead>
+                  <UiTableHead class="w-[50px] pr-4"></UiTableHead>
                 </UiTableRow>
               </UiTableHeader>
               <UiTableBody>
@@ -250,8 +257,17 @@ const formatDate = (dateString: string) => {
                   <UiTableCell class="hidden md:table-cell">
                     <div class="text-sm text-slate-600 line-clamp-1">{{ sale.description && sale.description !== 'Vente' ? sale.description : '-' }}</div>
                   </UiTableCell>
-                  <UiTableCell class="text-right pr-4 font-semibold text-slate-900">
+                  <UiTableCell class="text-right font-semibold text-slate-900">
                     {{ formatCurrency(sale.amount) }}
+                  </UiTableCell>
+                  <UiTableCell class="pr-4 text-right">
+                    <button 
+                      @click="handleDelete(sale.id)" 
+                      class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100 focus:opacity-100"
+                      title="Supprimer la vente"
+                    >
+                      <Trash2 class="w-4 h-4" />
+                    </button>
                   </UiTableCell>
                 </UiTableRow>
               </UiTableBody>
