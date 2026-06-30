@@ -6,11 +6,13 @@ import { Input } from '@/components/ui/input'
 import { Table as UiTable, TableBody as UiTableBody, TableCell as UiTableCell, TableHead as UiTableHead, TableHeader as UiTableHeader, TableRow as UiTableRow } from '@/components/ui/table'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
-import { Wallet, CreditCard, Banknote, Smartphone, Calendar, Search, Trash2 } from 'lucide-vue-next'
+import { Wallet, CreditCard, Banknote, Smartphone, Calendar, Search, Trash2, ArrowRight } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
 const store = useSalesStore()
+const router = useRouter()
 
 const currentMonthName = computed(() => {
   return new Intl.DateTimeFormat('fr-FR', { month: 'long' }).format(new Date())
@@ -155,32 +157,32 @@ const handleDelete = async (id: string) => {
 
 <template>
   <div class="space-y-6">
-    <div class="grid gap-6 grid-cols-1 md:grid-cols-2">
+    <div class="grid gap-3 md:gap-6 grid-cols-2">
       <!-- CA Column -->
-      <div class="space-y-4">
-        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <Wallet class="w-5 h-5 text-red-500" />
-          Chiffre d'Affaires
+      <div class="space-y-3 md:space-y-4">
+        <h2 class="text-sm md:text-xl font-bold text-slate-800 flex items-center gap-1 md:gap-2">
+          <Wallet class="w-4 h-4 md:w-5 md:h-5 text-red-500" />
+          <span class="truncate">Chiffre d'Affaires</span>
         </h2>
         
         <Card class="bg-gradient-to-br from-red-600 to-red-500 text-white border-0 shadow-lg relative overflow-hidden">
           <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
             <Wallet class="w-32 h-32 -mt-4 -mr-4" />
           </div>
-          <CardHeader class="pb-2 z-10 relative">
-            <CardTitle class="text-sm font-medium text-red-100">CA Aujourd'hui (J)</CardTitle>
+          <CardHeader class="pb-1 md:pb-2 p-3 md:p-6 z-10 relative">
+            <CardTitle class="text-[10px] md:text-sm font-medium text-red-100 truncate">CA Aujourd'hui (J)</CardTitle>
           </CardHeader>
-          <CardContent class="z-10 relative">
-            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.todayCA) }}</div>
+          <CardContent class="p-3 pt-0 md:p-6 md:pt-0 z-10 relative">
+            <div class="text-base sm:text-lg md:text-3xl font-bold tracking-tight truncate">{{ formatCurrency(store.todayCA) }}</div>
           </CardContent>
         </Card>
 
         <Card class="bg-gradient-to-br from-red-500 to-red-400 text-white border-0 shadow-lg relative overflow-hidden">
-          <CardHeader class="pb-2 z-10 relative">
-            <CardTitle class="text-sm font-medium text-red-100">CA Cette Semaine (S)</CardTitle>
+          <CardHeader class="pb-1 md:pb-2 p-3 md:p-6 z-10 relative">
+            <CardTitle class="text-[10px] md:text-sm font-medium text-red-100 truncate">CA Cette Semaine (S)</CardTitle>
           </CardHeader>
-          <CardContent class="z-10 relative">
-            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.thisWeekCA) }}</div>
+          <CardContent class="p-3 pt-0 md:p-6 md:pt-0 z-10 relative">
+            <div class="text-base sm:text-lg md:text-3xl font-bold tracking-tight truncate">{{ formatCurrency(store.thisWeekCA) }}</div>
           </CardContent>
         </Card>
 
@@ -188,40 +190,40 @@ const handleDelete = async (id: string) => {
           <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
             <Calendar class="w-32 h-32 -mt-4 -mr-4" />
           </div>
-          <CardHeader class="pb-2 z-10 relative">
-            <CardTitle class="text-sm font-medium text-red-100 capitalize">CA Mois ({{ currentMonthName }})</CardTitle>
+          <CardHeader class="pb-1 md:pb-2 p-3 md:p-6 z-10 relative">
+            <CardTitle class="text-[10px] md:text-sm font-medium text-red-100 capitalize truncate">CA Mois ({{ currentMonthName }})</CardTitle>
           </CardHeader>
-          <CardContent class="z-10 relative">
-            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.thisMonthCA) }}</div>
+          <CardContent class="p-3 pt-0 md:p-6 md:pt-0 z-10 relative">
+            <div class="text-base sm:text-lg md:text-3xl font-bold tracking-tight truncate">{{ formatCurrency(store.thisMonthCA) }}</div>
           </CardContent>
         </Card>
       </div>
 
       <!-- Encaissements Column -->
-      <div class="space-y-4">
-        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <Banknote class="w-5 h-5 text-blue-500" />
-          Encaissements
+      <div class="space-y-3 md:space-y-4">
+        <h2 class="text-sm md:text-xl font-bold text-slate-800 flex items-center gap-1 md:gap-2">
+          <Banknote class="w-4 h-4 md:w-5 md:h-5 text-blue-500" />
+          <span class="truncate">Encaissements</span>
         </h2>
         
         <Card class="bg-gradient-to-br from-blue-600 to-blue-500 text-white border-0 shadow-lg relative overflow-hidden">
           <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
             <Wallet class="w-32 h-32 -mt-4 -mr-4" />
           </div>
-          <CardHeader class="pb-2 z-10 relative">
-            <CardTitle class="text-sm font-medium text-blue-100">Total Aujourd'hui (J)</CardTitle>
+          <CardHeader class="pb-1 md:pb-2 p-3 md:p-6 z-10 relative">
+            <CardTitle class="text-[10px] md:text-sm font-medium text-blue-100 truncate">Total Aujourd'hui (J)</CardTitle>
           </CardHeader>
-          <CardContent class="z-10 relative">
-            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.todayEncaissementTotal) }}</div>
+          <CardContent class="p-3 pt-0 md:p-6 md:pt-0 z-10 relative">
+            <div class="text-base sm:text-lg md:text-3xl font-bold tracking-tight truncate">{{ formatCurrency(store.todayEncaissementTotal) }}</div>
           </CardContent>
         </Card>
 
         <Card class="bg-gradient-to-br from-blue-500 to-blue-400 text-white border-0 shadow-lg relative overflow-hidden">
-          <CardHeader class="pb-2 z-10 relative">
-            <CardTitle class="text-sm font-medium text-blue-100">Total Cette Semaine (S)</CardTitle>
+          <CardHeader class="pb-1 md:pb-2 p-3 md:p-6 z-10 relative">
+            <CardTitle class="text-[10px] md:text-sm font-medium text-blue-100 truncate">Total Semaine (S)</CardTitle>
           </CardHeader>
-          <CardContent class="z-10 relative">
-            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.thisWeekEncaissementTotal) }}</div>
+          <CardContent class="p-3 pt-0 md:p-6 md:pt-0 z-10 relative">
+            <div class="text-base sm:text-lg md:text-3xl font-bold tracking-tight truncate">{{ formatCurrency(store.thisWeekEncaissementTotal) }}</div>
           </CardContent>
         </Card>
 
@@ -229,56 +231,60 @@ const handleDelete = async (id: string) => {
           <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
             <Calendar class="w-32 h-32 -mt-4 -mr-4" />
           </div>
-          <CardHeader class="pb-2 z-10 relative">
-            <CardTitle class="text-sm font-medium text-blue-100 capitalize">Total Mois ({{ currentMonthName }})</CardTitle>
+          <CardHeader class="pb-1 md:pb-2 p-3 md:p-6 z-10 relative">
+            <CardTitle class="text-[10px] md:text-sm font-medium text-blue-100 capitalize truncate">Total Mois ({{ currentMonthName }})</CardTitle>
           </CardHeader>
-          <CardContent class="z-10 relative">
-            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.thisMonthEncaissementTotal) }}</div>
+          <CardContent class="p-3 pt-0 md:p-6 md:pt-0 z-10 relative">
+            <div class="text-base sm:text-lg md:text-3xl font-bold tracking-tight truncate">{{ formatCurrency(store.thisMonthEncaissementTotal) }}</div>
           </CardContent>
         </Card>
 
-        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider pt-2">Détails du jour</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-blue-500">
-            <CardHeader class="flex flex-row items-center justify-between pb-2">
-              <CardTitle class="text-xs font-medium text-slate-500">Carte Bancaire</CardTitle>
-              <CreditCard class="w-4 h-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div class="text-xl font-bold text-slate-900">{{ formatCurrency(store.todayRevenueCB) }}</div>
-            </CardContent>
-          </Card>
-          
-          <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-emerald-500">
-            <CardHeader class="flex flex-row items-center justify-between pb-2">
-              <CardTitle class="text-xs font-medium text-slate-500">Espèces</CardTitle>
-              <Banknote class="w-4 h-4 text-emerald-500" />
-            </CardHeader>
-            <CardContent>
-              <div class="text-xl font-bold text-slate-900">{{ formatCurrency(store.todayRevenueEspece) }}</div>
-            </CardContent>
-          </Card>
+      </div>
+    </div>
 
-          <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-amber-500">
-            <CardHeader class="flex flex-row items-center justify-between pb-2">
-              <CardTitle class="text-xs font-medium text-slate-500">Virement</CardTitle>
-              <Wallet class="w-4 h-4 text-amber-500" />
-            </CardHeader>
-            <CardContent>
-              <div class="text-xl font-bold text-slate-900">{{ formatCurrency(store.todayRevenueVirement) }}</div>
-            </CardContent>
-          </Card>
+    <!-- Détails du jour (Full width) -->
+    <div class="space-y-4">
+      <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider pt-2">Détails du jour</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-blue-500">
+          <CardHeader class="flex flex-row items-center justify-between pb-2 p-4 md:p-6">
+            <CardTitle class="text-[11px] md:text-xs font-medium text-slate-500 truncate mr-2">Carte Bancaire</CardTitle>
+            <CreditCard class="w-4 h-4 text-blue-500 shrink-0" />
+          </CardHeader>
+          <CardContent class="p-4 pt-0 md:p-6 md:pt-0">
+            <div class="text-lg md:text-xl font-bold text-slate-900 truncate">{{ formatCurrency(store.todayRevenueCB) }}</div>
+          </CardContent>
+        </Card>
+        
+        <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-emerald-500">
+          <CardHeader class="flex flex-row items-center justify-between pb-2 p-4 md:p-6">
+            <CardTitle class="text-[11px] md:text-xs font-medium text-slate-500 truncate mr-2">Espèces</CardTitle>
+            <Banknote class="w-4 h-4 text-emerald-500 shrink-0" />
+          </CardHeader>
+          <CardContent class="p-4 pt-0 md:p-6 md:pt-0">
+            <div class="text-lg md:text-xl font-bold text-slate-900 truncate">{{ formatCurrency(store.todayRevenueEspece) }}</div>
+          </CardContent>
+        </Card>
 
-          <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-purple-500">
-            <CardHeader class="flex flex-row items-center justify-between pb-2">
-              <CardTitle class="text-xs font-medium text-slate-500">Floa</CardTitle>
-              <Smartphone class="w-4 h-4 text-purple-500" />
-            </CardHeader>
-            <CardContent>
-              <div class="text-xl font-bold text-slate-900">{{ formatCurrency(store.todayRevenueFloa) }}</div>
-            </CardContent>
-          </Card>
-        </div>
+        <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-amber-500">
+          <CardHeader class="flex flex-row items-center justify-between pb-2 p-4 md:p-6">
+            <CardTitle class="text-[11px] md:text-xs font-medium text-slate-500 truncate mr-2">Virement</CardTitle>
+            <Wallet class="w-4 h-4 text-amber-500 shrink-0" />
+          </CardHeader>
+          <CardContent class="p-4 pt-0 md:p-6 md:pt-0">
+            <div class="text-lg md:text-xl font-bold text-slate-900 truncate">{{ formatCurrency(store.todayRevenueVirement) }}</div>
+          </CardContent>
+        </Card>
+
+        <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-purple-500">
+          <CardHeader class="flex flex-row items-center justify-between pb-2 p-4 md:p-6">
+            <CardTitle class="text-[11px] md:text-xs font-medium text-slate-500 truncate mr-2">Floa</CardTitle>
+            <Smartphone class="w-4 h-4 text-purple-500 shrink-0" />
+          </CardHeader>
+          <CardContent class="p-4 pt-0 md:p-6 md:pt-0">
+            <div class="text-lg md:text-xl font-bold text-slate-900 truncate">{{ formatCurrency(store.todayRevenueFloa) }}</div>
+          </CardContent>
+        </Card>
       </div>
     </div>
 
@@ -363,13 +369,22 @@ const handleDelete = async (id: string) => {
                 </UiTableRow>
               </UiTableBody>
             </UiTable>
+            <div class="p-4 border-t border-slate-100 flex justify-center bg-slate-50/50">
+              <button 
+                @click="router.push({ name: 'history' })"
+                class="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                Voir tout l'historique
+                <ArrowRight class="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </CardContent>
       </Card>
     </div>
 
     <!-- Small unaccessible reset button -->
-    <div class="pt-8 pb-2 flex justify-end">
+    <div class="pt-4 pb-2 flex justify-end">
       <button 
         @click="store.deleteAllSales()" 
         class="text-[10px] text-slate-300 hover:text-red-500 transition-colors px-2 py-1 opacity-50 hover:opacity-100"

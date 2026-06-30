@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, PlusCircle } from 'lucide-vue-next'
+import { LayoutDashboard, PlusCircle, History } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
@@ -29,6 +29,14 @@ const router = useRouter()
           >
             <LayoutDashboard class="w-4 h-4 mr-2" />
             Tableau de bord
+          </Button>
+          <Button 
+            :variant="route.name === 'history' ? 'secondary' : 'ghost'"
+            class="rounded-full px-6 transition-all duration-300"
+            @click="router.push({ name: 'history' })"
+          >
+            <History class="w-4 h-4 mr-2" />
+            Historique
           </Button>
           <Button 
             class="rounded-full px-4 bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
@@ -95,12 +103,14 @@ const router = useRouter()
         </div>
 
         <button 
-          class="flex flex-col items-center justify-center w-full h-full gap-1 text-slate-400 opacity-50 cursor-not-allowed"
+          @click="router.push({ name: 'history' })"
+          class="flex flex-col items-center justify-center w-full h-full gap-1 transition-colors"
+          :class="route.name === 'history' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-600'"
         >
-          <div class="p-1.5">
-            <div class="w-5 h-5 rounded border-2 border-current opacity-80" />
+          <div :class="['p-1.5 rounded-full transition-all duration-300', route.name === 'history' ? 'bg-slate-100' : '']">
+            <History class="w-5 h-5" />
           </div>
-          <span class="text-[10px] font-medium">Réglages</span>
+          <span class="text-[10px] font-medium">Historique</span>
         </button>
       </div>
     </nav>
