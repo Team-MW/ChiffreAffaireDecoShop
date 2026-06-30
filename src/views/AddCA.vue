@@ -27,7 +27,7 @@ const handleSubmit = async () => {
   await store.addSale({
     date: formData.value.date,
     amount: parseFloat(formData.value.amount),
-    paymentMethod: 'CA', // CA is set automatically
+    paymentMethod: 'CA', // CA is set autsssomatically
     description: 'CA' // To make it clear in the table
   })
   
