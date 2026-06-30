@@ -17,42 +17,69 @@ const currentMonthName = computed(() => {
 })
 
 const chartData = computed(() => {
-  const salesByDate: Record<string, number> = {}
+  const caByDate: Record<string, number> = {}
+  const encaissementByDate: Record<string, number> = {}
   
   // Create last 7 days empty so chart always looks good
   for (let i = 6; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
-    salesByDate[d.toLocaleDateString('fr-FR')] = 0
+    const dateStr = d.toLocaleDateString('fr-FR')
+    caByDate[dateStr] = 0
+    encaissementByDate[dateStr] = 0
   }
 
   const sortedSales = [...store.sales].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
   
   sortedSales.forEach(sale => {
     const dateStr = new Date(sale.date).toLocaleDateString('fr-FR')
-    if (salesByDate[dateStr] !== undefined) {
-      salesByDate[dateStr] += sale.amount
+    if (caByDate[dateStr] !== undefined) {
+      if (sale.paymentMethod === 'CA') {
+        caByDate[dateStr] += sale.amount
+      } else {
+        encaissementByDate[dateStr] += sale.amount
+      }
     } else {
-      salesByDate[dateStr] = sale.amount
+      if (sale.paymentMethod === 'CA') {
+        caByDate[dateStr] = sale.amount
+        encaissementByDate[dateStr] = 0
+      } else {
+        encaissementByDate[dateStr] = sale.amount
+        caByDate[dateStr] = 0
+      }
     }
   })
 
-  // We take only the last 7 to 10 entries for a cleaner mobile chart
-  const labels = Object.keys(salesByDate).slice(-7)
-  const data = Object.values(salesByDate).slice(-7)
+  // We take only the last 7 entries for a cleaner mobile chart
+  const labels = Object.keys(caByDate).slice(-7)
+  const caData = Object.values(caByDate).slice(-7)
+  const encData = Object.values(encaissementByDate).slice(-7)
 
   return {
     labels,
     datasets: [
       {
-        label: 'Chiffre d\'affaires (€)',
-        borderColor: '#0f172a',
-        backgroundColor: 'rgba(15, 23, 42, 0.1)',
-        data,
+        label: 'CA (€)',
+        borderColor: '#ef4444',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        data: caData,
         tension: 0.4,
         fill: true,
         pointBackgroundColor: '#ffffff',
-        pointBorderColor: '#0f172a',
+        pointBorderColor: '#ef4444',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      },
+      {
+        label: 'Encaissements (€)',
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        data: encData,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#ffffff',
+        pointBorderColor: '#3b82f6',
         pointBorderWidth: 2,
         pointRadius: 4,
         pointHoverRadius: 6
@@ -83,14 +110,14 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    legend: { display: false },
+    legend: { display: true, position: 'top' as const },
     tooltip: {
       backgroundColor: '#0f172a',
       padding: 12,
       cornerRadius: 8,
       titleFont: { size: 13, family: "'Geist', sans-serif" },
       bodyFont: { size: 14, weight: 'bold', family: "'Geist', sans-serif" },
-      displayColors: false,
+      displayColors: true,
     }
   },
   scales: {
@@ -128,71 +155,131 @@ const handleDelete = async (id: string) => {
 
 <template>
   <div class="space-y-6">
-    <!-- Top Stats (Mobile Optimized) -->
-    <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
-      <Card class="bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0 shadow-lg relative overflow-hidden col-span-2">
-        <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
-          <Wallet class="w-32 h-32 -mt-4 -mr-4" />
+    <div class="grid gap-6 grid-cols-1 md:grid-cols-2">
+      <!-- CA Column -->
+      <div class="space-y-4">
+        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <Wallet class="w-5 h-5 text-red-500" />
+          Chiffre d'Affaires
+        </h2>
+        
+        <Card class="bg-gradient-to-br from-red-600 to-red-500 text-white border-0 shadow-lg relative overflow-hidden">
+          <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
+            <Wallet class="w-32 h-32 -mt-4 -mr-4" />
+          </div>
+          <CardHeader class="pb-2 z-10 relative">
+            <CardTitle class="text-sm font-medium text-red-100">CA Aujourd'hui (J)</CardTitle>
+          </CardHeader>
+          <CardContent class="z-10 relative">
+            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.todayCA) }}</div>
+          </CardContent>
+        </Card>
+
+        <Card class="bg-gradient-to-br from-red-500 to-red-400 text-white border-0 shadow-lg relative overflow-hidden">
+          <CardHeader class="pb-2 z-10 relative">
+            <CardTitle class="text-sm font-medium text-red-100">CA Cette Semaine (S)</CardTitle>
+          </CardHeader>
+          <CardContent class="z-10 relative">
+            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.thisWeekCA) }}</div>
+          </CardContent>
+        </Card>
+
+        <Card class="bg-gradient-to-br from-red-500 to-red-400 text-white border-0 shadow-lg relative overflow-hidden">
+          <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
+            <Calendar class="w-32 h-32 -mt-4 -mr-4" />
+          </div>
+          <CardHeader class="pb-2 z-10 relative">
+            <CardTitle class="text-sm font-medium text-red-100 capitalize">CA Mois ({{ currentMonthName }})</CardTitle>
+          </CardHeader>
+          <CardContent class="z-10 relative">
+            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.thisMonthCA) }}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Encaissements Column -->
+      <div class="space-y-4">
+        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <Banknote class="w-5 h-5 text-blue-500" />
+          Encaissements
+        </h2>
+        
+        <Card class="bg-gradient-to-br from-blue-600 to-blue-500 text-white border-0 shadow-lg relative overflow-hidden">
+          <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
+            <Wallet class="w-32 h-32 -mt-4 -mr-4" />
+          </div>
+          <CardHeader class="pb-2 z-10 relative">
+            <CardTitle class="text-sm font-medium text-blue-100">Total Aujourd'hui (J)</CardTitle>
+          </CardHeader>
+          <CardContent class="z-10 relative">
+            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.todayEncaissementTotal) }}</div>
+          </CardContent>
+        </Card>
+
+        <Card class="bg-gradient-to-br from-blue-500 to-blue-400 text-white border-0 shadow-lg relative overflow-hidden">
+          <CardHeader class="pb-2 z-10 relative">
+            <CardTitle class="text-sm font-medium text-blue-100">Total Cette Semaine (S)</CardTitle>
+          </CardHeader>
+          <CardContent class="z-10 relative">
+            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.thisWeekEncaissementTotal) }}</div>
+          </CardContent>
+        </Card>
+
+        <Card class="bg-gradient-to-br from-blue-500 to-blue-400 text-white border-0 shadow-lg relative overflow-hidden">
+          <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
+            <Calendar class="w-32 h-32 -mt-4 -mr-4" />
+          </div>
+          <CardHeader class="pb-2 z-10 relative">
+            <CardTitle class="text-sm font-medium text-blue-100 capitalize">Total Mois ({{ currentMonthName }})</CardTitle>
+          </CardHeader>
+          <CardContent class="z-10 relative">
+            <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.thisMonthEncaissementTotal) }}</div>
+          </CardContent>
+        </Card>
+
+        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider pt-2">Détails du jour</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-blue-500">
+            <CardHeader class="flex flex-row items-center justify-between pb-2">
+              <CardTitle class="text-xs font-medium text-slate-500">Carte Bancaire</CardTitle>
+              <CreditCard class="w-4 h-4 text-blue-500" />
+            </CardHeader>
+            <CardContent>
+              <div class="text-xl font-bold text-slate-900">{{ formatCurrency(store.todayRevenueCB) }}</div>
+            </CardContent>
+          </Card>
+          
+          <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-emerald-500">
+            <CardHeader class="flex flex-row items-center justify-between pb-2">
+              <CardTitle class="text-xs font-medium text-slate-500">Espèces</CardTitle>
+              <Banknote class="w-4 h-4 text-emerald-500" />
+            </CardHeader>
+            <CardContent>
+              <div class="text-xl font-bold text-slate-900">{{ formatCurrency(store.todayRevenueEspece) }}</div>
+            </CardContent>
+          </Card>
+
+          <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-amber-500">
+            <CardHeader class="flex flex-row items-center justify-between pb-2">
+              <CardTitle class="text-xs font-medium text-slate-500">Virement</CardTitle>
+              <Wallet class="w-4 h-4 text-amber-500" />
+            </CardHeader>
+            <CardContent>
+              <div class="text-xl font-bold text-slate-900">{{ formatCurrency(store.todayRevenueVirement) }}</div>
+            </CardContent>
+          </Card>
+
+          <Card class="shadow-sm border-slate-200/60 border-l-4 border-l-purple-500">
+            <CardHeader class="flex flex-row items-center justify-between pb-2">
+              <CardTitle class="text-xs font-medium text-slate-500">Floa</CardTitle>
+              <Smartphone class="w-4 h-4 text-purple-500" />
+            </CardHeader>
+            <CardContent>
+              <div class="text-xl font-bold text-slate-900">{{ formatCurrency(store.todayRevenueFloa) }}</div>
+            </CardContent>
+          </Card>
         </div>
-        <CardHeader class="flex flex-row items-center justify-between pb-2 z-10 relative">
-          <CardTitle class="text-sm font-medium text-slate-300">Total Aujourd'hui</CardTitle>
-        </CardHeader>
-        <CardContent class="z-10 relative">
-          <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.todayRevenue) }}</div>
-        </CardContent>
-      </Card>
-
-      <Card class="shadow-sm border-slate-200/60">
-        <CardHeader class="flex flex-row items-center justify-between pb-2">
-          <CardTitle class="text-xs font-medium text-slate-500">Carte Bancaire</CardTitle>
-          <CreditCard class="w-4 h-4 text-blue-500" />
-        </CardHeader>
-        <CardContent>
-          <div class="text-lg font-bold text-slate-900">{{ formatCurrency(store.todayRevenueCB) }}</div>
-        </CardContent>
-      </Card>
-      
-      <Card class="shadow-sm border-slate-200/60">
-        <CardHeader class="flex flex-row items-center justify-between pb-2">
-          <CardTitle class="text-xs font-medium text-slate-500">Espèces</CardTitle>
-          <Banknote class="w-4 h-4 text-emerald-500" />
-        </CardHeader>
-        <CardContent>
-          <div class="text-lg font-bold text-slate-900">{{ formatCurrency(store.todayRevenueEspece) }}</div>
-        </CardContent>
-      </Card>
-
-      <Card class="shadow-sm border-slate-200/60">
-        <CardHeader class="flex flex-row items-center justify-between pb-2">
-          <CardTitle class="text-xs font-medium text-slate-500">Floa</CardTitle>
-          <Smartphone class="w-4 h-4 text-purple-500" />
-        </CardHeader>
-        <CardContent>
-          <div class="text-lg font-bold text-slate-900">{{ formatCurrency(store.todayRevenueFloa) }}</div>
-        </CardContent>
-      </Card>
-
-      <Card class="shadow-sm border-slate-200/60">
-        <CardHeader class="flex flex-row items-center justify-between pb-2">
-          <CardTitle class="text-xs font-medium text-slate-500">Cette Semaine</CardTitle>
-          <CalendarDays class="w-4 h-4 text-orange-500" />
-        </CardHeader>
-        <CardContent>
-          <div class="text-lg font-bold text-slate-900">{{ formatCurrency(store.thisWeekRevenue) }}</div>
-        </CardContent>
-      </Card>
-
-      <Card class="bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0 shadow-lg relative overflow-hidden col-span-2 lg:col-span-4">
-        <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
-          <Calendar class="w-32 h-32 -mt-4 -mr-4" />
-        </div>
-        <CardHeader class="flex flex-row items-center justify-between pb-2 z-10 relative">
-          <CardTitle class="text-sm font-medium text-slate-300 capitalize">Mois de {{ currentMonthName }}</CardTitle>
-        </CardHeader>
-        <CardContent class="z-10 relative">
-          <div class="text-3xl font-bold tracking-tight">{{ formatCurrency(store.thisMonthRevenue) }}</div>
-        </CardContent>
-      </Card>
+      </div>
     </div>
 
     <!-- Main Grid -->
@@ -248,7 +335,10 @@ const handleDelete = async (id: string) => {
               <UiTableBody>
                 <UiTableRow v-for="sale in filteredSales" :key="sale.id" class="group">
                   <UiTableCell class="pl-4">
-                    <div class="font-medium text-slate-900 line-clamp-1">Vente ({{ sale.paymentMethod || 'CB' }})</div>
+                    <div class="font-medium text-slate-900 line-clamp-1">
+                      <span v-if="sale.paymentMethod === 'CA'" class="text-red-600">CA</span>
+                      <span v-else>Encaissement ({{ sale.paymentMethod || 'CB' }})</span>
+                    </div>
                     <div class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                       <span>{{ formatDate(sale.date) }}</span>
                       <span v-if="sale.clientName && sale.clientName !== 'Client'" class="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-medium">{{ sale.clientName }}</span>

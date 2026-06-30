@@ -31,11 +31,18 @@ const router = useRouter()
             Tableau de bord
           </Button>
           <Button 
-            class="rounded-full px-6 bg-slate-900 hover:bg-slate-800 text-white shadow-md hover:shadow-lg transition-all duration-300"
+            class="rounded-full px-4 bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
             @click="router.push({ name: 'add-sale' })"
           >
             <PlusCircle class="w-4 h-4 mr-2" />
-            Nouvelle Vente
+            Encaissement
+          </Button>
+          <Button 
+            class="rounded-full px-4 bg-red-600 hover:bg-red-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
+            @click="router.push({ name: 'add-ca' })"
+          >
+            <PlusCircle class="w-4 h-4 mr-2" />
+            Nouveau CA
           </Button>
         </nav>
       </div>
@@ -70,10 +77,18 @@ const router = useRouter()
           <span class="text-[10px] font-medium">Dashboard</span>
         </button>
 
-        <div class="relative -top-5 flex justify-center w-full">
+        <div class="relative -top-5 flex justify-center w-full gap-4">
           <button 
             @click="router.push({ name: 'add-sale' })"
-            class="flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 text-white shadow-lg hover:bg-slate-800 transition-all duration-300 hover:scale-105 hover:-translate-y-1"
+            class="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-all duration-300 hover:scale-105 hover:-translate-y-1"
+            title="Nouvel Encaissement"
+          >
+            <PlusCircle class="w-6 h-6" />
+          </button>
+          <button 
+            @click="router.push({ name: 'add-ca' })"
+            class="flex items-center justify-center w-14 h-14 rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700 transition-all duration-300 hover:scale-105 hover:-translate-y-1"
+            title="Nouveau CA"
           >
             <PlusCircle class="w-6 h-6" />
           </button>

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Dashboard from '../views/Dashboard.vue'
 import AddSale from '../views/AddSale.vue'
+import AddCA from '../views/AddCA.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -14,6 +15,11 @@ const router = createRouter({
       path: '/add',
       name: 'add-sale',
       component: AddSale
+    },
+    {
+      path: '/add-ca',
+      name: 'add-ca',
+      component: AddCA
     }
   ]
 })

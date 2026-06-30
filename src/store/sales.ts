@@ -8,7 +8,7 @@ export interface Sale {
   clientName?: string
   description?: string
   amount: number
-  paymentMethod: 'CB' | 'ESPECE' | 'FLOA' | 'VIREMENT'
+  paymentMethod: 'CB' | 'ESPECE' | 'FLOA' | 'VIREMENT' | 'CA'
   orderNumber?: string
 }
 
@@ -32,11 +32,10 @@ export const useSalesStore = defineStore('sales', () => {
   }
 
   const addSale = async (sale: Omit<Sale, 'id'>) => {
-    // Fournir des valeurs par défaut pour satisfaire les contraintes NOT NULL de Supabase
     const payload = {
       ...sale,
       clientName: sale.clientName || 'Client',
-      description: sale.description || 'Vente'
+      description: sale.description || (sale.paymentMethod === 'CA' ? 'Chiffre d\'Affaires' : 'Vente')
     }
 
     const { data, error } = await supabase
@@ -81,75 +80,127 @@ export const useSalesStore = defineStore('sales', () => {
     isLoading.value = false
   }
 
-  const totalRevenue = computed(() => {
-    return sales.value.reduce((sum, sale) => sum + sale.amount, 0)
-  })
+  const caSales = computed(() => sales.value.filter(s => s.paymentMethod === 'CA'))
+  const encaissementSales = computed(() => sales.value.filter(s => s.paymentMethod !== 'CA'))
 
-  const todayRevenue = computed(() => {
+  // === CA ===
+  const todayCA = computed(() => {
     const today = new Date().toLocaleDateString('fr-FR')
-    return sales.value
+    return caSales.value
       .filter(sale => new Date(sale.date).toLocaleDateString('fr-FR') === today)
       .reduce((sum, sale) => sum + sale.amount, 0)
   })
 
-  const thisWeekRevenue = computed(() => {
+  const thisWeekCA = computed(() => {
     const now = new Date()
     const startOfWeek = new Date(now)
-    // Adjust to Monday
     const day = startOfWeek.getDay()
     const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1)
     startOfWeek.setDate(diff)
     startOfWeek.setHours(0, 0, 0, 0)
 
-    return sales.value
+    return caSales.value
       .filter(sale => new Date(sale.date) >= startOfWeek)
       .reduce((sum, sale) => sum + sale.amount, 0)
   })
 
-  const thisMonthRevenue = computed(() => {
+  const thisMonthCA = computed(() => {
     const now = new Date()
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
-    return sales.value
+    return caSales.value
       .filter(sale => new Date(sale.date) >= startOfMonth)
       .reduce((sum, sale) => sum + sale.amount, 0)
   })
 
-  // === Statistiques par moyen de paiement (Aujourd'hui) ===
+  // === Encaissements (Aujourd'hui) ===
   const todayRevenueCB = computed(() => {
     const today = new Date().toLocaleDateString('fr-FR')
-    return sales.value
+    return encaissementSales.value
       .filter(sale => new Date(sale.date).toLocaleDateString('fr-FR') === today && sale.paymentMethod === 'CB')
       .reduce((sum, sale) => sum + sale.amount, 0)
   })
 
   const todayRevenueEspece = computed(() => {
     const today = new Date().toLocaleDateString('fr-FR')
-    return sales.value
+    return encaissementSales.value
       .filter(sale => new Date(sale.date).toLocaleDateString('fr-FR') === today && sale.paymentMethod === 'ESPECE')
       .reduce((sum, sale) => sum + sale.amount, 0)
   })
 
   const todayRevenueFloa = computed(() => {
     const today = new Date().toLocaleDateString('fr-FR')
-    return sales.value
+    return encaissementSales.value
       .filter(sale => new Date(sale.date).toLocaleDateString('fr-FR') === today && sale.paymentMethod === 'FLOA')
       .reduce((sum, sale) => sum + sale.amount, 0)
   })
 
+  const todayRevenueVirement = computed(() => {
+    const today = new Date().toLocaleDateString('fr-FR')
+    return encaissementSales.value
+      .filter(sale => new Date(sale.date).toLocaleDateString('fr-FR') === today && sale.paymentMethod === 'VIREMENT')
+      .reduce((sum, sale) => sum + sale.amount, 0)
+  })
+
+  const todayEncaissementTotal = computed(() => {
+    const today = new Date().toLocaleDateString('fr-FR')
+    return encaissementSales.value
+      .filter(sale => new Date(sale.date).toLocaleDateString('fr-FR') === today)
+      .reduce((sum, sale) => sum + sale.amount, 0)
+  })
+
+  const thisWeekEncaissementTotal = computed(() => {
+    const now = new Date()
+    const startOfWeek = new Date(now)
+    const day = startOfWeek.getDay()
+    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1)
+    startOfWeek.setDate(diff)
+    startOfWeek.setHours(0, 0, 0, 0)
+
+    return encaissementSales.value
+      .filter(sale => new Date(sale.date) >= startOfWeek)
+      .reduce((sum, sale) => sum + sale.amount, 0)
+  })
+
+  const thisMonthEncaissementTotal = computed(() => {
+    const now = new Date()
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+
+    return encaissementSales.value
+      .filter(sale => new Date(sale.date) >= startOfMonth)
+      .reduce((sum, sale) => sum + sale.amount, 0)
+  })
+
+  // === Anciens getters pour ne pas casser AddSale/Dashboard s'ils les utilisent (on va les nettoyer ou les adapter) ===
+  const totalRevenue = computed(() => sales.value.reduce((sum, sale) => sum + sale.amount, 0))
+  const todayRevenue = computed(() => todayEncaissementTotal.value)
+  const thisWeekRevenue = computed(() => thisWeekCA.value)
+  const thisMonthRevenue = computed(() => thisMonthCA.value)
+
   return {
     sales,
+    caSales,
+    encaissementSales,
     isLoading,
     fetchSales,
     addSale,
     deleteSale,
     deleteAllSales,
+    todayCA,
+    thisWeekCA,
+    thisMonthCA,
+    todayRevenueCB,
+    todayRevenueEspece,
+    todayRevenueFloa,
+    todayRevenueVirement,
+    todayEncaissementTotal,
+    thisWeekEncaissementTotal,
+    thisMonthEncaissementTotal,
+    // Keep for compatibility during transition
     totalRevenue,
     todayRevenue,
     thisWeekRevenue,
-    thisMonthRevenue,
-    todayRevenueCB,
-    todayRevenueEspece,
-    todayRevenueFloa
+    thisMonthRevenue
   }
 })
+
